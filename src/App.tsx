@@ -70,6 +70,22 @@ export default function App() {
     (country: Country, openPopup = true) => {
       setSelectedId(country.id)
       markExplored(country.id)
+      // Keep list visible when jumping via map or neighbour chips
+      setQuery((q) => {
+        const needle = q.trim().toLowerCase()
+        if (!needle) return q
+        const matches =
+          country.name.toLowerCase().includes(needle) ||
+          (country.capital?.toLowerCase().includes(needle) ?? false) ||
+          country.cca2.toLowerCase() === needle ||
+          country.cca3.toLowerCase() === needle
+        return matches ? q : ''
+      })
+      setContinent((current) =>
+        current === 'All' || country.continent === current
+          ? current
+          : country.continent,
+      )
       if (openPopup) setPopupOpen(true)
     },
     [markExplored],
