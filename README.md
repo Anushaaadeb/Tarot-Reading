@@ -1,15 +1,16 @@
-# Arcana Veil
+# ORBIS
 
-Interactive tarot & astrology interface — purple, gold, and black.
+Interactive world geography atlas — learn every country, capital, and neighbour continent by continent.
 
 ## Features
 
-- **Full 78-card deck** — Major and Minor Arcana (Wands, Cups, Swords, Pentacles)
-- **Spreads** — Single card, Past/Present/Future, Situation/Action/Outcome, Relationship Cross, Horseshoe, Celtic Cross, Yes/No oracle
-- **User card picking** — Shuffle, filter by arcana/suit, and choose each card yourself
-- **Specific question answers** — Position-aware interpretations for your question
-- **Zodiac** — All 12 signs with love, career, daily guidance, and sun-sign finder
-- **Astrology** — Moon phases, planetary domains, and the four elements
+- **Interactive world map** — click any country to locate it
+- **Continent filters** — Africa, Asia, Europe, North America, South America, Oceania, Antarctica
+- **Selection colours** — selected country in green, neighbouring countries in red
+- **Swift pop motion** — spring zoom and selection pop on the map
+- **Country study card** — flag, mini map, capital, coordinates, area, population, languages, currencies, and geography notes
+- **Search** — find by country name or capital
+- **Explored progress** — remembers countries you have opened
 
 ## Develop
 
