@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Header } from './components/Header'
 import { ContinentNav } from './components/ContinentNav'
 import { CountryList } from './components/CountryList'
 import { WorldMap } from './components/WorldMap'
-import { CountryPopup } from './components/CountryPopup'
+import { CountrySidePanel } from './components/CountrySidePanel'
 import { useCountries } from './hooks/useCountries'
 import type { Continent, Country } from './types'
 
@@ -24,7 +25,7 @@ export default function App() {
   const [continent, setContinent] = useState<Continent | 'All'>('All')
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [popupOpen, setPopupOpen] = useState(false)
+  const [showDetail, setShowDetail] = useState(false)
   const [explored, setExplored] = useState<Set<string>>(() => loadExplored())
 
   const selected = selectedId ? (byId.get(selectedId) ?? null) : null
@@ -67,10 +68,10 @@ export default function App() {
   }, [])
 
   const selectCountry = useCallback(
-    (country: Country, openPopup = true) => {
+    (country: Country) => {
       setSelectedId(country.id)
+      setShowDetail(true)
       markExplored(country.id)
-      // Keep list visible when jumping via map or neighbour chips
       setQuery((q) => {
         const needle = q.trim().toLowerCase()
         if (!needle) return q
@@ -86,7 +87,6 @@ export default function App() {
           ? current
           : country.continent,
       )
-      if (openPopup) setPopupOpen(true)
     },
     [markExplored],
   )
@@ -94,10 +94,14 @@ export default function App() {
   const selectById = useCallback(
     (id: string) => {
       const country = byId.get(id)
-      if (country) selectCountry(country, true)
+      if (country) selectCountry(country)
     },
     [byId, selectCountry],
   )
+
+  const backToList = useCallback(() => {
+    setShowDetail(false)
+  }, [])
 
   return (
     <div className="app-shell">
@@ -114,28 +118,45 @@ export default function App() {
           countryIdsInFilter={countryIdsInFilter}
           onSelectId={selectById}
         />
-        <CountryList
-          countries={filtered}
-          selectedId={selectedId}
-          neighborIds={neighborIds}
-          explored={explored}
-          onSelect={(c) => selectCountry(c, true)}
-          query={query}
-          onQueryChange={setQuery}
-        />
-      </main>
 
-      <CountryPopup
-        country={popupOpen ? selected : null}
-        neighbors={neighbors}
-        onClose={() => setPopupOpen(false)}
-        onSelectNeighbor={(c) => selectCountry(c, true)}
-      />
+        <div className="side-rail">
+          <AnimatePresence mode="wait" initial={false}>
+            {showDetail && selected ? (
+              <CountrySidePanel
+                key={`detail-${selected.cca3}`}
+                country={selected}
+                neighbors={neighbors}
+                onBack={backToList}
+                onSelectNeighbor={selectCountry}
+              />
+            ) : (
+              <motion.div
+                key="browse"
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: 0.22 }}
+                className="side-panel-wrap"
+              >
+                <CountryList
+                  countries={filtered}
+                  selectedId={selectedId}
+                  neighborIds={neighborIds}
+                  explored={explored}
+                  onSelect={selectCountry}
+                  query={query}
+                  onQueryChange={setQuery}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </main>
 
       <footer className="site-footer">
         <p>
           Tap any country on the map or in the list. Selected lands glow green; neighbours
-          turn red. Open the card to study capital, location, and geography.
+          turn red. Details open beside the map so you can keep studying both.
         </p>
       </footer>
     </div>
