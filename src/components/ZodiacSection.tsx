@@ -101,11 +101,17 @@ export function ZodiacSection() {
 
 function SunSignFinder({ onFound }: { onFound: (s: ZodiacSign) => void }) {
   const [date, setDate] = useState('')
+  const [found, setFound] = useState<ZodiacSign | null>(null)
 
   function find() {
     if (!date) return
-    const d = new Date(date + 'T12:00:00')
-    onFound(getSunSign(d.getMonth() + 1, d.getDate()))
+    const parts = date.split('-').map(Number)
+    if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) return
+    const [, month, day] = parts
+    const sign = getSunSign(month, day)
+    setFound(sign)
+    onFound(sign)
+    document.getElementById('zodiac')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
@@ -118,12 +124,20 @@ function SunSignFinder({ onFound }: { onFound: (s: ZodiacSign) => void }) {
           id="birth-date"
           type="date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) => {
+            setDate(e.target.value)
+            setFound(null)
+          }}
         />
       </div>
       <button type="button" className="btn btn-gold" onClick={find} disabled={!date}>
         Reveal sun sign
       </button>
+      {found && (
+        <p className="horoscope-result" role="status">
+          {found.symbol} Your sun sign is <strong>{found.name}</strong> ({found.dates}).
+        </p>
+      )}
     </div>
   )
 }
