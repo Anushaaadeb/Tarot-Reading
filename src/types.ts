@@ -56,7 +56,7 @@ export const CONTINENT_META: Record<
   { blurb: string; hue: string }
 > = {
   Africa: {
-    blurb: '54 nations across deserts, savannas, and ancient trade routes.',
+    blurb: 'Deserts, savannas, coastlines, and ancient trade routes across the continent.',
     hue: '#c4a35a',
   },
   Asia: {
